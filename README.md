@@ -14,4 +14,10 @@ Coming soon!
 
 ## Current Issues
 
-Doesn't quite work yet. :P
+There is a bug (or maybe a deliberate change) in the Starbound SHA256 
+implementation, which results in the hash for every 55 character string to be 
+incorrect. This means reading any file from an AssetsDatabase that has a 55 
+character file path will not work.
+
+Also, this is not ready for use yet. It needs cleaning up before I'll consider
+it a proper library. All the functionality is there, however.

@@ -32,19 +32,17 @@ public class AssetDatabase extends SimpleSha256Database {
 			return fileList;
 		}
 		
-		String indexData = new String((byte[]) getItem("_index".getBytes()));
-		
-		fileList = unpackStringList(indexData);
+		fileList = unpackStringList(getItem("_index".getBytes()));
 		
 		return fileList;
 		
 	}
 	
-	public Set<String> unpackStringList(final String data) throws IOException, StarDBException {
+	public Set<String> unpackStringList(final byte[] data) throws IOException, StarDBException {
 		
 		Set<String> output = new HashSet<>();
 		
-		ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
+		ByteBuffer buffer = ByteBuffer.wrap(data);
 		buffer.rewind();
 		
 		SeekableInMemoryByteChannel stream = new SeekableInMemoryByteChannel();
@@ -66,6 +64,25 @@ public class AssetDatabase extends SimpleSha256Database {
 		
 	}
 	
+	/*
+	 * def getBrokenFiles(self):
+        brokenFiles = []
+        for name in self.getFileList():
+            if len(name) == 55:
+                brokenFiles.append(name)
+        return brokenFiles
+	 */
+	
+	public Set<String> getBrokenFiles() throws NoSuchAlgorithmException, StarDBException, IOException {
+		Set<String> output = new HashSet<>();
+		for (String file : getFileList()) {
+			if (file.length() == 55) {
+				output.add(file);
+			}
+		}
+		return output;
+	}
+	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, StarDBException {
 		
 		BlockFile bf = new BlockFile(Paths.get("D:\\Games\\Steam\\steamapps\\common\\Starbound\\assets\\packed.pak"));
@@ -74,11 +91,11 @@ public class AssetDatabase extends SimpleSha256Database {
 		
 		System.out.println(
 			new String(
-				(byte[]) db.getItem("/player.config".getBytes())
+				db.getItem("/player.config".getBytes())
 			)
 		);
 		
-		System.out.println(db.getFileList());
+		System.out.println(db.getBrokenFiles());
 		
 	}
 	

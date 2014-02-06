@@ -46,7 +46,7 @@ public class SimpleDatabase extends BTreeDatabase {
 	}
 
 	@Override
-	public Object readData(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException {
+	public byte[] readData(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException {
 		
 		int size = readVLQU(buff);
 		

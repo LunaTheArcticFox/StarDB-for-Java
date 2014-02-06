@@ -5,16 +5,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.krazyweb.stardb.btree.IndexNode.IndexElement;
-
 public class LeafNode {
 	
 	protected class LeafElement implements Comparable<LeafElement> {
 		
 		private byte[] key;
-		private Object data;
+		private byte[] data;
 		
-		public LeafElement(final byte[] key, final Object data) {
+		public LeafElement(final byte[] key, final byte[] data) {
 			this.key = key;
 			this.data = data;
 		}
@@ -49,8 +47,8 @@ public class LeafNode {
 		elements = new ArrayList<>(); //This list must be sorted by key
 	}
 	
-	protected Object findData(final byte[] key) {
-		int i = Collections.binarySearch(elements, new LeafElement(key, 0));
+	protected byte[] findData(final byte[] key) {
+		int i = Collections.binarySearch(elements, new LeafElement(key, new byte[] {}));
 		if (i < 0) {
 			i += 1;
 			i = Math.abs(i);
@@ -63,12 +61,12 @@ public class LeafNode {
 		}
 	}
 	
-	protected Object getItem(final byte[] key) {
+	protected byte[] getItem(final byte[] key) {
 		return findData(key);
 	}
 	
 	//Since self.elements must be sorted, this should be used with care
-	protected void addElement(final byte[] key, final Object data) {
+	protected void addElement(final byte[] key, final byte[] data) {
 		elements.add(new LeafElement(key, data));
 	}
 	

@@ -250,7 +250,7 @@ public abstract class BTreeDatabase extends BTree {
 		
 		for (int i = 0; i < count; i++) {
 			byte[] key = readKey(leafInput);
-			Object data = readData(leafInput);
+			byte[] data = readData(leafInput);
 			leaf.addElement(key, data);
 		}
 		
@@ -261,6 +261,6 @@ public abstract class BTreeDatabase extends BTree {
 	public abstract int getKeySize();
 	public abstract String getContentIdentifier();
 	public abstract byte[] readKey(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException;
-	public abstract Object readData(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException;
+	public abstract byte[] readData(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException;
 	
 }

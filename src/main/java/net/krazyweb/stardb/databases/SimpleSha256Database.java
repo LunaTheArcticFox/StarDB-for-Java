@@ -13,7 +13,7 @@ public class SimpleSha256Database extends SimpleDatabase {
 		super(blockFile, contentID, 32);
 	}
 	
-	public Object find(final byte[] key) throws StarDBException, IOException, NoSuchAlgorithmException {
+	public byte[] find(final byte[] key) throws StarDBException, IOException, NoSuchAlgorithmException {
 		
 		MessageDigest md = MessageDigest.getInstance("SHA-256");
 		byte[] digest = md.digest(key);

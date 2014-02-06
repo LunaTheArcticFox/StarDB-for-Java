@@ -17,7 +17,7 @@ public abstract class BTree {
 		rootPointer = 0;
 	}
 	
-	public Object find(final byte[] key) throws StarDBException, IOException, NoSuchAlgorithmException {
+	public byte[] find(final byte[] key) throws StarDBException, IOException, NoSuchAlgorithmException {
 		if (rootIsLeaf) {
 			return findInLeaf(loadLeaf(rootPointer), key);
 		} else {
@@ -25,7 +25,7 @@ public abstract class BTree {
 		}
 	}
 	
-	public Object getItem(final byte[] key) throws StarDBException, IOException, NoSuchAlgorithmException {
+	public byte[] getItem(final byte[] key) throws StarDBException, IOException, NoSuchAlgorithmException {
 		return find(key);
 	}
 	
@@ -37,11 +37,11 @@ public abstract class BTree {
 		}
 	}
 	
-	public Object findInLeaf(final LeafNode leaf, final byte[] key) {
+	public byte[] findInLeaf(final LeafNode leaf, final byte[] key) {
 		return leaf.findData(key);
 	}
 	
-	public Object findInIndex(final IndexNode index, final byte[] key) throws StarDBException, IOException {
+	public byte[] findInIndex(final IndexNode index, final byte[] key) throws StarDBException, IOException {
 		int i = index.find(key);
 		if (index.level == 0) {
 			return findInLeaf(loadLeaf(index.pointer(i)), key);
