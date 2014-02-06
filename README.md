@@ -1,4 +1,4 @@
-# StarDB
+# StarDB for Java
 
 A port of the Python library for manipulating Starbound database files to Java.
 The code is loosely based on [yuedb](https://bitbucket.org/kyren/yuedb), which 
