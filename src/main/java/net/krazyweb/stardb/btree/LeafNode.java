@@ -28,7 +28,7 @@ public class LeafNode {
 				if (key[i] == other.key[i]) {
 					continue;
 				}
-				return key[i] - other.key[i];
+				return (char) key[i] - (char) other.key[i];
 			}
 			
 			return 0;

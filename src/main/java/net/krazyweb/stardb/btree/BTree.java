@@ -43,7 +43,6 @@ public abstract class BTree {
 	
 	public Object findInIndex(final IndexNode index, final byte[] key) throws StarDBException, IOException {
 		int i = index.find(key);
-		System.out.println(i);
 		if (index.level == 0) {
 			return findInLeaf(loadLeaf(index.pointer(i)), key);
 		} else {

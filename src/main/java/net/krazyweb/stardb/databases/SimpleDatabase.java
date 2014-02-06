@@ -41,11 +41,6 @@ public class SimpleDatabase extends BTreeDatabase {
 			buffer.order(ByteOrder.BIG_ENDIAN);
 			buff.read(buffer);
 			buffer.rewind();
-			System.out.print("-> ");
-			for (byte b : buffer.array()) {
-				System.out.print((0xFF & b) + " ");
-			}
-			System.out.println();
 			return buffer.array();
 		}
 	}

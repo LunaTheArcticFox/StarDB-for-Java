@@ -27,8 +27,6 @@ public abstract class BTreeDatabase extends BTree {
 			
 			ByteBuffer data = ByteBuffer.allocate(size);
 			
-			System.out.println(blockBuffer.position() + " ,, " + blockBuffer.size());
-			
 			long blockDataSize = blockStorage.blockSize - 4;
 			long bytesToRead = size;
 			
@@ -37,12 +35,10 @@ public abstract class BTreeDatabase extends BTree {
 				boolean endOfBlock = false;
 				
 				if ((blockBuffer.position() + bytesToRead) < blockDataSize) {
-	                System.out.println((blockDataSize - blockBuffer.position()) + " --- " + bytesToRead);
 					blockBuffer.read(data);
 	                bytesToRead = 0;
 				} else {
 	                long bytesAvailable = blockDataSize - blockBuffer.position();
-	                System.out.println(bytesAvailable + " --- " + bytesToRead);
 	                ByteBuffer tempBuffer = ByteBuffer.allocate((int) bytesAvailable);
                     blockBuffer.read(tempBuffer);
                     tempBuffer.rewind();
@@ -120,8 +116,6 @@ public abstract class BTreeDatabase extends BTree {
 		
 		rootPointer = buffer.getInt();
 		rootIsLeaf = (buffer.get() == 1);
-		
-		System.out.println("!!!" + rootPointer);
 		
 	}
 	

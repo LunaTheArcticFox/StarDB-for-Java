@@ -21,17 +21,14 @@ public class IndexNode {
 		public int compareTo(final IndexElement other) {
 			
 			if (Arrays.equals(key, other.key)) {
-				System.out.println(0);
 				return 0;
 			}
 			
 			for (int i = 0; i < key.length; i++) {
 				if (key[i] == other.key[i]) {
-					System.out.println("cont");
 					continue;
 				}
-				System.out.println(key[i] - other.key[i]);
-				return key[i] - other.key[i];
+				return (char) key[i] - (char) other.key[i];
 			}
 			
 			return 0;
@@ -67,17 +64,14 @@ public class IndexNode {
 	 * used internally to figure out which branch of the tree to go down.
 	 */
 	protected int find(final byte[] key) {
-		int i = Collections.binarySearch(pointers, new IndexElement(key, 0)); //TODO BINARY SEARCH DOES NOT WORK FIX THIS
-		System.out.println("+ " + i + " ---- " + pointers.size());
+		int i = Collections.binarySearch(pointers, new IndexElement(key, 0));
 		if (i < 0) {
 			i += 1;
 			i = Math.abs(i);
 		}
 		if (i != pointers.size() && pointers.get(i).key.equals(key)) {
-			System.out.println("OPTION");
 			return i + 1;
 		} else {
-			System.out.println("DECISION");
 			return i;
 		}
 	}
