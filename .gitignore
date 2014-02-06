@@ -1,0 +1,14 @@
+/backups
+/bin
+/build
+/data
+/mods
+/target
+.classpath
+.project
+.settings
+build.fxbuild
+config.ini
+database
+errors.log
+modmanager.log
