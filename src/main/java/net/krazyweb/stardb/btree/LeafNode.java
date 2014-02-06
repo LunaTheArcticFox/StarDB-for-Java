@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.krazyweb.stardb.btree.IndexNode.IndexElement;
+
 public class LeafNode {
 	
 	protected class LeafElement implements Comparable<LeafElement> {
@@ -53,9 +55,10 @@ public class LeafNode {
 			i += 1;
 			i = Math.abs(i);
 		}
-		if (i != elements.size()) {
+		if (i != elements.size() && Arrays.equals(elements.get(i).key, key)) {
 			return elements.get(i).data;
 		} else {
+			System.out.println("Key not found! " + new String(key));
 			return null;
 		}
 	}

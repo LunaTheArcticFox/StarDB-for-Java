@@ -23,7 +23,7 @@ public class AssetDatabase extends SimpleSha256Database {
 	}
 	
 	public Object getDigest() throws NoSuchAlgorithmException, StarDBException, IOException {
-		return super.getItem("_digest".getBytes());
+		return getItem("_digest".getBytes());
 	}
 	
 	public Set<String> getFileList() throws NoSuchAlgorithmException, StarDBException, IOException {
@@ -32,7 +32,7 @@ public class AssetDatabase extends SimpleSha256Database {
 			return fileList;
 		}
 		
-		String indexData = (String) super.getItem("_index".getBytes());
+		String indexData = new String((byte[]) getItem("_index".getBytes()));
 		
 		fileList = unpackStringList(indexData);
 		
@@ -65,38 +65,20 @@ public class AssetDatabase extends SimpleSha256Database {
 		return output;
 		
 	}
-	/*
-    # Since Starbound's SHA256 implementation is broken for 55 length strings,
-    # this function will get you a list of all files which can't be found.
-    def getBrokenFiles(self):
-        brokenFiles = []
-        for name in self.getFileList():
-            if len(name) == 55:
-                brokenFiles.append(name)
-        return brokenFiles
-	 */
 	
-	/*
-	 * def unpackStringList(data):
-    stream = BytesIO(data) # TODO: I think this makes a copy
-    count = readVLQU(stream)
-    strings = []
-    for i in range(count):
-        strLen = readVLQU(stream)
-        strings.append(stream.read(strLen).decode('utf-8'))
-    return strings
-	 */
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, StarDBException {
 		
 		BlockFile bf = new BlockFile(Paths.get("D:\\Games\\Steam\\steamapps\\common\\Starbound\\assets\\packed.pak"));
 		AssetDatabase db = new AssetDatabase(bf);
 		db.open();
-		System.out.println("__" + 
+		
+		System.out.println(
 			new String(
-				(byte[]) db.getItem("/weather/snow/snow.weather".getBytes())
+				(byte[]) db.getItem("/player.config".getBytes())
 			)
 		);
-		//System.out.println(db.getFileList());
+		
+		System.out.println(db.getFileList());
 		
 	}
 	

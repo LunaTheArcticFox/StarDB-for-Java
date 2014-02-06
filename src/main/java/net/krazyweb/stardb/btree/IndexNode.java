@@ -69,7 +69,7 @@ public class IndexNode {
 			i += 1;
 			i = Math.abs(i);
 		}
-		if (i != pointers.size() && pointers.get(i).key.equals(key)) {
+		if (i != pointers.size() && Arrays.equals(pointers.get(i).key, key)) {
 			System.out.println("OPTION");
 			return i + 1;
 		} else {
