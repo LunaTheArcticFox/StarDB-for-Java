@@ -53,7 +53,7 @@ public class LeafNode {
 			i += 1;
 			i = Math.abs(i);
 		}
-		if (i != elements.size() && elements.get(i).key.equals(key)) {
+		if (i != elements.size()) {
 			return elements.get(i).data;
 		} else {
 			return null;

@@ -46,7 +46,7 @@ public abstract class BTreeDatabase extends BTree {
                     bytesToRead -= bytesAvailable;
                     endOfBlock = true;
 				}
-
+				
 				if (endOfBlock && bytesToRead > 0) {
 	                ByteBuffer tempBuffer = ByteBuffer.allocate(4);
 	                tempBuffer.order(ByteOrder.BIG_ENDIAN);

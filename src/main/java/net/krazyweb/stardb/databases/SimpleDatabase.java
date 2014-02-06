@@ -80,7 +80,7 @@ public class SimpleDatabase extends BTreeDatabase {
 				
 				ByteBuffer buff = leafStream.read(1);
 				
-				byte temp = buff.get();
+				int temp = buff.get();
 				
 				value = (value << 7 | (temp & 0x7f));
 				
@@ -90,9 +90,7 @@ public class SimpleDatabase extends BTreeDatabase {
 				
 			}
 			
-			ByteBuffer buff = leafStream.read(value);
-	    	
-			return buff.getInt();
+			return value;
 			
 		} else {
 			
@@ -114,13 +112,8 @@ public class SimpleDatabase extends BTreeDatabase {
 				}
 				
 			}
-			
-			ByteBuffer buff = ByteBuffer.allocate(value);
-			buff.order(ByteOrder.BIG_ENDIAN);
-			stream.read(buff);
-			buff.rewind();
 	    		
-			return buff.getInt();
+			return value;
 		
 		}
 		

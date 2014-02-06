@@ -91,7 +91,11 @@ public class AssetDatabase extends SimpleSha256Database {
 		BlockFile bf = new BlockFile(Paths.get("D:\\Games\\Steam\\steamapps\\common\\Starbound\\assets\\packed.pak"));
 		AssetDatabase db = new AssetDatabase(bf);
 		db.open();
-		System.out.println(db.getItem("/weather/snow/snow.weather".getBytes()));
+		System.out.println("__" + 
+			new String(
+				(byte[]) db.getItem("/weather/snow/snow.weather".getBytes())
+			)
+		);
 		//System.out.println(db.getFileList());
 		
 	}
