@@ -15,6 +15,11 @@ First, open the database file:
 AssetDatabase db = AssetDatabase.open("D:/Games/Steam/steamapps/common/Starbound/assets/packed.pak");
 ```
 
+Alternatively, use a Path:
+```java
+AssetDatabase db = AssetDatabase.open(Paths.get("D:/Games/Steam/steamapps/common/Starbound/assets/packed.pak"));
+```
+
 You can then grab individual assets from the database as byte arrays:
 ```java
 System.out.println(new String(db.getAsset("/player.config")));
