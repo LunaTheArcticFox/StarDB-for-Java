@@ -7,5 +7,9 @@ public class StarDBException extends Exception {
 	public StarDBException(final String message) {
 		super(message);
 	}
+	
+	public StarDBException(final String message, final Exception e) {
+		super(message, e);
+	}
 
 }

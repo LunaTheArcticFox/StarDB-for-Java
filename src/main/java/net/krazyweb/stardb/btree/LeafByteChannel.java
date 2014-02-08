@@ -3,6 +3,7 @@ package net.krazyweb.stardb.btree;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.SeekableByteChannel;
 
 import net.krazyweb.stardb.exceptions.StarDBException;
 import net.krazyweb.stardb.storage.BlockStorage;
@@ -14,9 +15,9 @@ public class LeafByteChannel extends SeekableInMemoryByteChannel {
 	private String leafMagic = "LL";
 	
 	private BlockStorage blockStorage;
-	private SeekableInMemoryByteChannel blockBuffer;
+	private SeekableByteChannel blockBuffer;
 	
-	protected LeafByteChannel(final BlockStorage blockStorage, final SeekableInMemoryByteChannel blockBuffer) {
+	protected LeafByteChannel(final BlockStorage blockStorage, final SeekableByteChannel blockBuffer) {
 		this.blockStorage = blockStorage;
 		this.blockBuffer = blockBuffer;
 	}
@@ -69,10 +70,10 @@ public class LeafByteChannel extends SeekableInMemoryByteChannel {
                     tempBuffer.rewind();
                     String magic = new String(tempBuffer.array());
                     if (!magic.equals(leafMagic)) {
-	                    throw new StarDBException("Incorrect leaf block signature");
+	                    throw new StarDBException("Incorrect leaf block signature"); //RUNTIMEEXCEPTION
                     }
-                } else {
-                    throw new StarDBException("Insufficient leaf data");
+                } else { 
+                    throw new StarDBException("Insufficient leaf data"); //RUNTIMEEXCEPTION
                 }
 			}
 

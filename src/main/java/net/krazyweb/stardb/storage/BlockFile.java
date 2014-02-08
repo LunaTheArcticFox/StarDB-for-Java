@@ -2,12 +2,13 @@ package net.krazyweb.stardb.storage;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+import net.krazyweb.stardb.StarDBUtils;
 import net.krazyweb.stardb.exceptions.StarDBException;
 
 import org.jboss.shrinkwrap.api.nio.file.SeekableInMemoryByteChannel;
@@ -18,9 +19,9 @@ public class BlockFile extends BlockStorage {
 	private final int prefixHeaderSize = 32;
 	
 	/**
-	 * TODO
-	 * @param filePath
-	 * @throws IOException 
+	 * Creates a new BlockFile instance from which to read a Starbound database file.
+	 * @param filePath - The path to the database file on disk.
+	 * @throws IOException - Could not open the database file.
 	 */
 	public BlockFile(final Path filePath) throws IOException {
 		
@@ -37,9 +38,9 @@ public class BlockFile extends BlockStorage {
 	}
 	
 	/**
-	 * TODO
-	 * @param filePath
-	 * @throws IOException 
+	 * Creates a new BlockFile instance from which to read a Starbound database file.
+	 * @param filePath - The path to the database file on disk.
+	 * @throws IOException - Could not open the database file.
 	 */
 	public BlockFile(final String filePath) throws IOException {
 		this(Paths.get(filePath));
@@ -59,15 +60,15 @@ public class BlockFile extends BlockStorage {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Returns the total size of the user header.
+	 * @return - The size of the user header in bytes.
 	 */
 	public int getUserHeaderSize() {
 		return headerSize - prefixHeaderSize;
 	}
 	
 	@Override
-	public SeekableInMemoryByteChannel readBlock(int blockIndex, int blockOffset, int size) throws StarDBException, IOException {
+	public SeekableByteChannel readBlock(int blockIndex, int blockOffset, int size) throws StarDBException {
 		
 		checkIfOpen(true);
 		
@@ -88,25 +89,33 @@ public class BlockFile extends BlockStorage {
 		
 		ByteBuffer buffer = ByteBuffer.allocate(size);
 		
-		dataFile.position(blockStart + (blockIndex * blockSize) + blockOffset);
-		dataFile.read(buffer);
-		buffer.rewind();
+		try {
+			dataFile.position(blockStart + (blockIndex * blockSize) + blockOffset);
+			buffer = StarDBUtils.readToBuffer(dataFile, size);
+		} catch (IOException e) {
+			throw new StarDBException("Error: " + e.getMessage(), e);
+		}
 		
 		SeekableInMemoryByteChannel output = new SeekableInMemoryByteChannel();
-		output.write(buffer);
-		output.position(0);
+		
+		try {
+			output.write(buffer);
+			output.position(0);
+		} catch (IOException e) {
+			throw new StarDBException("Error: " + e.getMessage(), e);
+		}
 		
 		return output;
 		
 	}
 	
 	@Override
-	public SeekableInMemoryByteChannel readBlock(int blockIndex) throws StarDBException, IOException {
+	public SeekableByteChannel readBlock(int blockIndex) throws StarDBException {
 		return readBlock(blockIndex, 0, 0);
 	}
 	
 	@Override
-	public SeekableInMemoryByteChannel readUserData(int dataOffset, int size) throws StarDBException, IOException {
+	public SeekableByteChannel readUserData(int dataOffset, int size) throws StarDBException {
 		
 		checkIfOpen(true);
 		
@@ -114,22 +123,30 @@ public class BlockFile extends BlockStorage {
 			throw new StarDBException("readUserData() called outside of bounds of user header");
 		}
 		
-		ByteBuffer buffer = ByteBuffer.allocate(size);
+		ByteBuffer buffer;
 		
-		dataFile.position(prefixHeaderSize + dataOffset);
-		dataFile.read(buffer);
-		buffer.rewind();
+		try {
+			dataFile.position(prefixHeaderSize + dataOffset);
+			buffer = StarDBUtils.readToBuffer(dataFile, size);
+		} catch (IOException e) {
+			throw new StarDBException("Error: " + e.getMessage(), e);
+		}
 
-		SeekableInMemoryByteChannel output = new SeekableInMemoryByteChannel();
-		output.write(buffer);
-		output.position(0);
+		SeekableByteChannel output = new SeekableInMemoryByteChannel();
+		
+		try {
+			output.write(buffer);
+			output.position(0);
+		} catch (IOException e) {
+			throw new StarDBException("Error: " + e.getMessage(), e);
+		}
 		
 		return output;
 		
 	}
 
 	@Override
-	public void open() throws StarDBException, IOException {
+	public void open() throws StarDBException {
 		
 		checkIfOpen(false);
 		
@@ -137,13 +154,18 @@ public class BlockFile extends BlockStorage {
 			throw new StarDBException("open() called with no file set.");
 		}
 		
-		long previousPosition = dataFile.position();
+		long previousPosition = -1;
 		
-		ByteBuffer buffer = ByteBuffer.allocate(6);
-
-		dataFile.position(0);
-		dataFile.read(buffer);
-		buffer.rewind();
+		try {
+			previousPosition = dataFile.position();
+			dataFile.position(0);
+		} catch (IOException e) {
+			throw new StarDBException("Error: " + e.getMessage(), e);
+		}
+		
+		ByteBuffer buffer = null;
+		
+		buffer = StarDBUtils.readToBuffer(dataFile, 6);
 		
 		String magic = new String(buffer.array());
 		
@@ -151,11 +173,7 @@ public class BlockFile extends BlockStorage {
 			throw new StarDBException("File is not a valid BlockFile");
 		}
 		
-		buffer = ByteBuffer.allocate(13);
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		
-		dataFile.read(buffer);
-		buffer.rewind();
+		buffer = StarDBUtils.readToBuffer(dataFile, 13);
 		
 		headerSize = buffer.getInt();
 		blockSize = buffer.getInt();
@@ -165,13 +183,19 @@ public class BlockFile extends BlockStorage {
 			headFreeIndexBlock = buffer.getInt();
 		}
 		
-		//TODO: I think if noFreeIndexBlock == True then we need recovery
-		
-		setExtents(headerSize, dataFile.size());
+		try {
+			setExtents(headerSize, dataFile.size());
+		} catch (IOException e) {
+			throw new StarDBException("Error: " + e.getMessage(), e);
+		}
 		
 		open = true;
 		
-		dataFile.position(previousPosition);
+		try {
+			dataFile.position(previousPosition);
+		} catch (IOException e) {
+			throw new StarDBException("Error: " + e.getMessage(), e);
+		}
 		
 	}
 	

@@ -41,12 +41,20 @@ public class LeafNode {
 	protected int nextLeaf;
 	protected List<LeafElement> elements;
 	
+	/**
+	 * 
+	 */
 	protected LeafNode() {
 		selfPointer = 0;
 		nextLeaf = 0;
 		elements = new ArrayList<>(); //This list must be sorted by key
 	}
 	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
 	protected byte[] findData(final byte[] key) {
 		int i = Collections.binarySearch(elements, new LeafElement(key, new byte[] {}));
 		if (i < 0) {
@@ -61,11 +69,21 @@ public class LeafNode {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
 	protected byte[] getItem(final byte[] key) {
 		return findData(key);
 	}
 	
 	//Since self.elements must be sorted, this should be used with care
+	/**
+	 * 
+	 * @param key
+	 * @param data
+	 */
 	protected void addElement(final byte[] key, final byte[] data) {
 		elements.add(new LeafElement(key, data));
 	}

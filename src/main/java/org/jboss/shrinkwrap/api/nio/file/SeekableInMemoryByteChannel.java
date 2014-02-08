@@ -1,5 +1,3 @@
-
-
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2012, Red Hat Middleware LLC, and individual contributors

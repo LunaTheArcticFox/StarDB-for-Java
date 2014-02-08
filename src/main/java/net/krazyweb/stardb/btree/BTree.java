@@ -10,6 +10,9 @@ public abstract class BTree {
 	protected boolean rootIsLeaf;
 	protected int rootPointer;
 	
+	/**
+	 * 
+	 */
 	protected BTree() {
 		rootIsLeaf = false;
 		rootPointer = 0;
@@ -39,7 +42,7 @@ public abstract class BTree {
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
-	protected byte[] getItem(final byte[] key) throws StarDBException, IOException, NoSuchAlgorithmException {
+	public byte[] getItem(final byte[] key) throws StarDBException, IOException, NoSuchAlgorithmException {
 		return find(key);
 	}
 	
@@ -72,7 +75,22 @@ public abstract class BTree {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param pointer
+	 * @return
+	 * @throws StarDBException
+	 * @throws IOException
+	 */
 	protected abstract LeafNode loadLeaf(final int pointer) throws StarDBException, IOException;
+	
+	/**
+	 * 
+	 * @param pointer
+	 * @return
+	 * @throws StarDBException
+	 * @throws IOException
+	 */
 	protected abstract IndexNode loadIndex(final int pointer) throws StarDBException, IOException;
 	
 }

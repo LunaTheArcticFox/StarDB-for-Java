@@ -2,14 +2,13 @@ package net.krazyweb.stardb.btree;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.krazyweb.stardb.StarDBUtils;
 import net.krazyweb.stardb.exceptions.StarDBException;
 import net.krazyweb.stardb.storage.BlockStorage;
-
-import org.jboss.shrinkwrap.api.nio.file.SeekableInMemoryByteChannel;
 
 public abstract class BTreeDatabase extends BTree {
 	
@@ -20,48 +19,60 @@ public abstract class BTreeDatabase extends BTree {
 	private BlockStorage blockStorage;
 	private Map<Integer, IndexNode> indexCache;
 	
+	/**
+	 * Constructs a new BTreeDatabase object that retrieves its data from the BlockStorage object. 
+	 * @param blockStorage - The object containing the b-tree file.
+	 */
 	protected BTreeDatabase(final BlockStorage blockStorage) {
 		super();
 		this.blockStorage = blockStorage;
 		this.indexCache = new HashMap<>();
 	}
 	
-	protected void readRoot() throws StarDBException, IOException {
+	/**
+	 * Reads the data from the root node from which the tree can be searched.
+	 * @throws StarDBException - An error occurred while reading the root data.
+	 */
+	protected void readRoot() throws StarDBException {
 		
-		SeekableInMemoryByteChannel rootData = blockStorage.readUserData(28, 14);
+		SeekableByteChannel rootData = blockStorage.readUserData(28, 14);
 		
-		ByteBuffer buffer = ByteBuffer.allocate(1);
-		rootData.read(buffer);
-		buffer.rewind();
+		ByteBuffer buffer = StarDBUtils.readToBuffer(rootData, 1);
 		
 		boolean unknownBool = (buffer.get() == 1);
 		
-		rootData.position(rootData.position() + 1);
-		
-		if (unknownBool) {
-			rootData.position(rootData.position() + 8);
+		try {
+			rootData.position(rootData.position() + 1);
+		} catch (IOException e) {
+			throw new StarDBException("Error: " + e.getMessage(), e);
 		}
 		
-		buffer = ByteBuffer.allocate(5);
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		rootData.read(buffer);
-		buffer.rewind();
+		if (unknownBool) {
+			try {
+				rootData.position(rootData.position() + 8);
+			} catch (IOException e) {
+				throw new StarDBException("Error: " + e.getMessage(), e);
+			}
+		}
+		
+		buffer = StarDBUtils.readToBuffer(rootData, 5);
 		
 		rootPointer = buffer.getInt();
 		rootIsLeaf = (buffer.get() == 1);
 		
 	}
 	
-	protected void open() throws StarDBException, IOException {
+	/**
+	 * 
+	 * @throws StarDBException
+	 */
+	protected void open() throws StarDBException {
 		
 		blockStorage.open();
 
-		SeekableInMemoryByteChannel userData = blockStorage.readUserData(0, 28);
+		SeekableByteChannel userData = blockStorage.readUserData(0, 28);
 
-		ByteBuffer buffer = ByteBuffer.allocate(12);
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		userData.read(buffer);
-		buffer.rewind();
+		ByteBuffer buffer = StarDBUtils.readToBuffer(userData, 12);
 		
 		String fileID = new String(buffer.array());
 		
@@ -69,10 +80,7 @@ public abstract class BTreeDatabase extends BTree {
 			throw new StarDBException("DB file identifier does not match expected value of " + fileIdentifier + " (Got " + fileID + ")");
 		}
 		
-		buffer = ByteBuffer.allocate(12);
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		userData.read(buffer);
-		buffer.rewind();
+		buffer = StarDBUtils.readToBuffer(userData, 12);
 		
 		String contentID = new String(buffer.array());
 		
@@ -80,10 +88,7 @@ public abstract class BTreeDatabase extends BTree {
 			throw new StarDBException("DB content identifier does not match expected value of " + getContentIdentifier() + " (Got " + contentID + ")");
 		}
 		
-		buffer = ByteBuffer.allocate(4);
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		userData.read(buffer);
-		buffer.rewind();
+		buffer = StarDBUtils.readToBuffer(userData, 4);
 		
 		int keySize = buffer.getInt();
 		
@@ -95,16 +100,20 @@ public abstract class BTreeDatabase extends BTree {
 		
 	}
 	
+	/**
+	 * 
+	 * @param pointer
+	 * @return
+	 * @throws StarDBException
+	 * @throws IOException
+	 */
 	protected IndexNode readIndex(final int pointer) throws StarDBException, IOException {
 		
 		IndexNode index = new IndexNode();
 
-		SeekableInMemoryByteChannel buff = blockStorage.readBlock(pointer);
+		SeekableByteChannel byteChannel = blockStorage.readBlock(pointer);
 		
-		ByteBuffer buffer = ByteBuffer.allocate(2);
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		buff.read(buffer);
-		buffer.rewind();
+		ByteBuffer buffer = StarDBUtils.readToBuffer(byteChannel, 2);
 		
 		String magic = new String(buffer.array());
 		
@@ -112,10 +121,7 @@ public abstract class BTreeDatabase extends BTree {
 			throw new StarDBException("Incorrect index block signature.");
 		}
 
-		buffer = ByteBuffer.allocate(9);
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		buff.read(buffer);
-		buffer.rewind();
+		buffer = StarDBUtils.readToBuffer(byteChannel, 9);
 		
 		index.selfPointer = pointer;
 		index.level = (char) buffer.get();
@@ -125,12 +131,9 @@ public abstract class BTreeDatabase extends BTree {
 		
 		for (int i = 0; i < numChildren; i++) {
 			
-			byte[] key = readKey(buff);
-
-			buffer = ByteBuffer.allocate(4);
-			buffer.order(ByteOrder.BIG_ENDIAN);
-			buff.read(buffer);
-			buffer.rewind();
+			byte[] key = readKey(byteChannel);
+			
+			buffer = StarDBUtils.readToBuffer(byteChannel, 4);
 			int newPointer = buffer.getInt();
 			
 			index.addPointer(key, newPointer);
@@ -159,12 +162,9 @@ public abstract class BTreeDatabase extends BTree {
 		
 		LeafNode leaf = new LeafNode();
 		
-		SeekableInMemoryByteChannel buff = blockStorage.readBlock(pointer);
+		SeekableByteChannel byteChannel = blockStorage.readBlock(pointer);
 
-		ByteBuffer buffer = ByteBuffer.allocate(2);
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		buff.read(buffer);
-		buffer.rewind();
+		ByteBuffer buffer = StarDBUtils.readToBuffer(byteChannel, 2);
 		
 		String magic = new String(buffer.array());
 		
@@ -174,7 +174,7 @@ public abstract class BTreeDatabase extends BTree {
 
 		leaf.selfPointer = pointer;
 		
-		LeafByteChannel leafInput = new LeafByteChannel(blockStorage, buff);
+		LeafByteChannel leafInput = new LeafByteChannel(blockStorage, byteChannel);
 		
 		int count = leafInput.read(4).getInt();
 		
@@ -188,9 +188,34 @@ public abstract class BTreeDatabase extends BTree {
 		
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	protected abstract int getKeySize();
+	
+	/**
+	 * 
+	 * @return
+	 */
 	protected abstract String getContentIdentifier();
-	protected abstract byte[] readKey(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException;
-	protected abstract byte[] readData(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException;
+	
+	/**
+	 * 
+	 * @param buff
+	 * @return
+	 * @throws IOException
+	 * @throws StarDBException
+	 */
+	protected abstract byte[] readKey(final SeekableByteChannel buff) throws IOException, StarDBException;
+	
+	/**
+	 * 
+	 * @param buff
+	 * @return
+	 * @throws IOException
+	 * @throws StarDBException
+	 */
+	protected abstract byte[] readData(final SeekableByteChannel buff) throws IOException, StarDBException;
 	
 }
