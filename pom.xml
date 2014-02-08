@@ -20,6 +20,15 @@
 		</license>
 	</licenses>
 
+	<url>https://github.com/KrazyTheFox/StarDB-for-Java</url>
+
+	<developers>
+		<developer>
+			<id>KrazyTheFox</id>
+			<name>Mitchell Matthews</name>
+		</developer>
+	</developers>
+
 	<build>
 		<plugins>
 			<plugin>
