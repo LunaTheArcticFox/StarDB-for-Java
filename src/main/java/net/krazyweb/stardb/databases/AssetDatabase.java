@@ -3,7 +3,10 @@ package net.krazyweb.stardb.databases;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,15 +20,50 @@ public class AssetDatabase extends SimpleSha256Database {
 	
 	private Set<String> fileList;
 	
-	public AssetDatabase(final BlockFile blockFile) {
+	private AssetDatabase(final BlockFile blockFile) {
 		super(blockFile, "Assets1");
 		fileList = null;
 	}
 	
+	/**
+	 * 
+	 * @param databaseFile
+	 * @return
+	 * @throws IOException 
+	 */
+	public static AssetDatabase open(final Path databaseFile) throws IOException {
+		BlockFile bf = new BlockFile(databaseFile);
+		return new AssetDatabase(bf);
+	}
+	
+	/**
+	 * 
+	 * @param databaseFile
+	 * @return
+	 * @throws IOException
+	 */
+	public static AssetDatabase open(final String databaseFile) throws IOException {
+		return open(Paths.get(databaseFile));
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws StarDBException
+	 * @throws IOException
+	 */
 	public Object getDigest() throws NoSuchAlgorithmException, StarDBException, IOException {
 		return getItem("_digest".getBytes());
 	}
 	
+	/**
+	 * 
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws StarDBException
+	 * @throws IOException
+	 */
 	public Set<String> getFileList() throws NoSuchAlgorithmException, StarDBException, IOException {
 		
 		if (fileList != null) {
@@ -38,7 +76,24 @@ public class AssetDatabase extends SimpleSha256Database {
 		
 	}
 	
-	public Set<String> unpackStringList(final byte[] data) throws IOException, StarDBException {
+	/**
+	 * 
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws StarDBException
+	 * @throws IOException
+	 */
+	public Set<String> getBrokenFiles() throws NoSuchAlgorithmException, StarDBException, IOException {
+		Set<String> output = new HashSet<>();
+		for (String file : getFileList()) {
+			if (file.length() == 55) {
+				output.add(file);
+			}
+		}
+		return output;
+	}
+	
+	private Set<String> unpackStringList(final byte[] data) throws IOException, StarDBException {
 		
 		Set<String> output = new HashSet<>();
 		
@@ -64,29 +119,10 @@ public class AssetDatabase extends SimpleSha256Database {
 		
 	}
 	
-	/*
-	 * def getBrokenFiles(self):
-        brokenFiles = []
-        for name in self.getFileList():
-            if len(name) == 55:
-                brokenFiles.append(name)
-        return brokenFiles
-	 */
-	
-	public Set<String> getBrokenFiles() throws NoSuchAlgorithmException, StarDBException, IOException {
-		Set<String> output = new HashSet<>();
-		for (String file : getFileList()) {
-			if (file.length() == 55) {
-				output.add(file);
-			}
-		}
-		return output;
-	}
-	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, StarDBException {
 		
-		BlockFile bf = new BlockFile(Paths.get("D:\\Games\\Steam\\steamapps\\common\\Starbound\\assets\\packed.pak"));
-		AssetDatabase db = new AssetDatabase(bf);
+		
+		AssetDatabase db = AssetDatabase.open("D:\\Games\\Steam\\steamapps\\common\\Starbound\\assets\\packed.pak");
 		db.open();
 		
 		System.out.println(
@@ -95,7 +131,19 @@ public class AssetDatabase extends SimpleSha256Database {
 			)
 		);
 		
+		ByteBuffer buffer = ByteBuffer.wrap(db.getItem("/tentacletex.png".getBytes()));
+		
+		FileChannel out = FileChannel.open(Paths.get("test.png"), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+		out.write(buffer);
+		out.force(false);
+		out.close();
+		
 		System.out.println(db.getBrokenFiles());
+		
+		//AssetDatabase db = new AssetDatabase("path/string");
+		//db.getItem("string");
+		//db.listItems();
+		//db.listBrokenFiles();
 		
 	}
 	

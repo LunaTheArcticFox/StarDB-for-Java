@@ -12,7 +12,7 @@ public class LeafNode {
 		private byte[] key;
 		private byte[] data;
 		
-		public LeafElement(final byte[] key, final byte[] data) {
+		private LeafElement(final byte[] key, final byte[] data) {
 			this.key = key;
 			this.data = data;
 		}
@@ -41,7 +41,7 @@ public class LeafNode {
 	protected int nextLeaf;
 	protected List<LeafElement> elements;
 	
-	public LeafNode() {
+	protected LeafNode() {
 		selfPointer = 0;
 		nextLeaf = 0;
 		elements = new ArrayList<>(); //This list must be sorted by key

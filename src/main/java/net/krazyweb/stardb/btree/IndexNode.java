@@ -7,12 +7,12 @@ import java.util.List;
 
 public class IndexNode {
 	
-	protected class IndexElement implements Comparable<IndexElement> {
+	private class IndexElement implements Comparable<IndexElement> {
 		
 		private byte[] key;
 		private int pointer;
 		
-		public IndexElement(final byte[] key, final int pointer) {
+		private IndexElement(final byte[] key, final int pointer) {
 			this.key = key;
 			this.pointer = pointer;
 		}
@@ -51,7 +51,7 @@ public class IndexNode {
 	protected int beginPointer;
 	private List<IndexElement> pointers;
 	
-	public IndexNode() {
+	protected IndexNode() {
 		selfPointer = 0;
 		level = 0;
 		beginPointer = 0;
@@ -70,10 +70,8 @@ public class IndexNode {
 			i = Math.abs(i);
 		}
 		if (i != pointers.size() && Arrays.equals(pointers.get(i).key, key)) {
-			System.out.println("OPTION");
 			return i + 1;
 		} else {
-			System.out.println("DECISION");
 			return i;
 		}
 	}

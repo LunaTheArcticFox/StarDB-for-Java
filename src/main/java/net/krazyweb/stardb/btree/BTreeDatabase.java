@@ -13,87 +13,20 @@ import org.jboss.shrinkwrap.api.nio.file.SeekableInMemoryByteChannel;
 
 public abstract class BTreeDatabase extends BTree {
 	
-	public class LeafInputStream extends SeekableInMemoryByteChannel {
-		
-		private BlockStorage blockStorage;
-		private SeekableInMemoryByteChannel blockBuffer;
-		
-		private LeafInputStream(final BlockStorage blockStorage, final SeekableInMemoryByteChannel blockBuffer) {
-			this.blockStorage = blockStorage;
-			this.blockBuffer = blockBuffer;
-		}
-		
-		public ByteBuffer read(final int size) throws IOException, StarDBException {
-			
-			ByteBuffer data = ByteBuffer.allocate(size);
-			
-			long blockDataSize = blockStorage.blockSize - 4;
-			long bytesToRead = size;
-			
-			while (bytesToRead > 0) {
-				
-				boolean endOfBlock = false;
-				
-				if ((blockBuffer.position() + bytesToRead) < blockDataSize) {
-					blockBuffer.read(data);
-	                bytesToRead = 0;
-				} else {
-	                long bytesAvailable = blockDataSize - blockBuffer.position();
-	                ByteBuffer tempBuffer = ByteBuffer.allocate((int) bytesAvailable);
-                    blockBuffer.read(tempBuffer);
-                    tempBuffer.rewind();
-                    data.put(tempBuffer);
-                    bytesToRead -= bytesAvailable;
-                    endOfBlock = true;
-				}
-				
-				if (endOfBlock && bytesToRead > 0) {
-	                ByteBuffer tempBuffer = ByteBuffer.allocate(4);
-	                tempBuffer.order(ByteOrder.BIG_ENDIAN);
-	                blockBuffer.read(tempBuffer);
-	                tempBuffer.rewind();
-	                int nextBlockPointer = tempBuffer.getInt();
-	                if (nextBlockPointer != -1) {
-	                    blockBuffer = blockStorage.readBlock(nextBlockPointer);
-	                    tempBuffer = ByteBuffer.allocate(2);
-	                    tempBuffer.order(ByteOrder.BIG_ENDIAN);
-	                    blockBuffer.read(tempBuffer);
-	                    tempBuffer.rewind();
-	                    String magic = new String(tempBuffer.array());
-	                    if (!magic.equals(leafMagic)) {
-		                    throw new StarDBException("Incorrect leaf block signature");
-	                    }
-	                } else {
-	                    throw new StarDBException("Insufficient leaf data");
-	                }
-				}
-
-			}
-
-			data.rewind();
-			return data;
-			
-		}
-		
-	}
+	private String fileIdentifier = "BTreeDB4";
+	private String indexMagic = "II";
+	private String leafMagic = "LL";
 	
-	public String fileIdentifier = "BTreeDB4";
-	public String indexMagic = "II";
-	public String leafMagic = "LL";
+	private BlockStorage blockStorage;
+	private Map<Integer, IndexNode> indexCache;
 	
-	public BlockStorage blockStorage;
-	public Map<Integer, IndexNode> indexCache;
-	
-	public SeekableInMemoryByteChannel currentBuffer;
-	public int currentLeafBlock;
-	
-	public BTreeDatabase(final BlockStorage blockStorage) {
+	protected BTreeDatabase(final BlockStorage blockStorage) {
 		super();
 		this.blockStorage = blockStorage;
 		this.indexCache = new HashMap<>();
 	}
 	
-	public void readRoot() throws StarDBException, IOException {
+	protected void readRoot() throws StarDBException, IOException {
 		
 		SeekableInMemoryByteChannel rootData = blockStorage.readUserData(28, 14);
 		
@@ -119,7 +52,7 @@ public abstract class BTreeDatabase extends BTree {
 		
 	}
 	
-	public void open() throws StarDBException, IOException {
+	protected void open() throws StarDBException, IOException {
 		
 		blockStorage.open();
 
@@ -162,12 +95,11 @@ public abstract class BTreeDatabase extends BTree {
 		
 	}
 	
-	public IndexNode readIndex(final int pointer) throws StarDBException, IOException {
+	protected IndexNode readIndex(final int pointer) throws StarDBException, IOException {
 		
 		IndexNode index = new IndexNode();
 
 		SeekableInMemoryByteChannel buff = blockStorage.readBlock(pointer);
-		currentBuffer = buff;
 		
 		ByteBuffer buffer = ByteBuffer.allocate(2);
 		buffer.order(ByteOrder.BIG_ENDIAN);
@@ -210,7 +142,7 @@ public abstract class BTreeDatabase extends BTree {
 	}
 
 	@Override
-	public IndexNode loadIndex(int pointer) throws StarDBException, IOException {
+	protected IndexNode loadIndex(int pointer) throws StarDBException, IOException {
 		
 		if (!indexCache.containsKey(pointer)) {
 			IndexNode index = readIndex(pointer);
@@ -223,12 +155,10 @@ public abstract class BTreeDatabase extends BTree {
 	}
 
 	@Override
-	public LeafNode loadLeaf(int pointer) throws StarDBException, IOException {
+	protected LeafNode loadLeaf(int pointer) throws StarDBException, IOException {
 		
 		LeafNode leaf = new LeafNode();
 		
-		currentLeafBlock = pointer;
-
 		SeekableInMemoryByteChannel buff = blockStorage.readBlock(pointer);
 
 		ByteBuffer buffer = ByteBuffer.allocate(2);
@@ -244,7 +174,7 @@ public abstract class BTreeDatabase extends BTree {
 
 		leaf.selfPointer = pointer;
 		
-		LeafInputStream leafInput = new LeafInputStream(blockStorage, buff);
+		LeafByteChannel leafInput = new LeafByteChannel(blockStorage, buff);
 		
 		int count = leafInput.read(4).getInt();
 		
@@ -258,9 +188,9 @@ public abstract class BTreeDatabase extends BTree {
 		
 	}
 	
-	public abstract int getKeySize();
-	public abstract String getContentIdentifier();
-	public abstract byte[] readKey(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException;
-	public abstract byte[] readData(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException;
+	protected abstract int getKeySize();
+	protected abstract String getContentIdentifier();
+	protected abstract byte[] readKey(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException;
+	protected abstract byte[] readData(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException;
 	
 }

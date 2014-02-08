@@ -13,7 +13,7 @@ public abstract class BlockStorage {
 	protected boolean open;
 	protected int headerSize;
 	protected int headFreeIndexBlock;
-	public int blockSize;
+	protected int blockSize;
 	protected long blockStart;
 	protected long blockEnd;
 	protected long blockCount;
@@ -29,6 +29,10 @@ public abstract class BlockStorage {
 		if (mustBeOpened && !open) {
 			throw new StarDBException("BlockStorage is opened, must not be opened!");
 		}
+	}
+	
+	public int getBlockSize() {
+		return blockSize;
 	}
 	
 	public abstract SeekableInMemoryByteChannel readBlock(final int blockIndex, final int blockOffset, final int size) throws StarDBException, IOException;

@@ -4,37 +4,38 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.jboss.shrinkwrap.api.nio.file.SeekableInMemoryByteChannel;
-
 import net.krazyweb.stardb.btree.BTreeDatabase;
+import net.krazyweb.stardb.btree.LeafByteChannel;
 import net.krazyweb.stardb.exceptions.StarDBException;
 import net.krazyweb.stardb.storage.BlockFile;
+
+import org.jboss.shrinkwrap.api.nio.file.SeekableInMemoryByteChannel;
 
 public class SimpleDatabase extends BTreeDatabase {
 	
 	private String contentIdentifier;
 	private int keySize;
 	
-	public SimpleDatabase(final BlockFile blockFile, final String contentID, final int keySize) {
+	protected SimpleDatabase(final BlockFile blockFile, final String contentID, final int keySize) {
 		super(blockFile);
 		contentIdentifier = contentID;
 		this.keySize = keySize;
 	}
 
 	@Override
-	public int getKeySize() {
+	protected int getKeySize() {
 		return keySize;
 	}
 
 	@Override
-	public String getContentIdentifier() {
+	protected String getContentIdentifier() {
 		return contentIdentifier;
 	}
 
 	@Override
-	public byte[] readKey(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException {
-		if (buff instanceof LeafInputStream) {
-			ByteBuffer buffer = ((LeafInputStream) buff).read(keySize);
+	protected byte[] readKey(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException {
+		if (buff instanceof LeafByteChannel) {
+			ByteBuffer buffer = ((LeafByteChannel) buff).read(keySize);
 			return buffer.array();
 		} else {
 			ByteBuffer buffer = ByteBuffer.allocate(keySize);
@@ -46,13 +47,13 @@ public class SimpleDatabase extends BTreeDatabase {
 	}
 
 	@Override
-	public byte[] readData(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException {
+	protected byte[] readData(final SeekableInMemoryByteChannel buff) throws IOException, StarDBException {
 		
 		int size = readVLQU(buff);
 		
-		if (buff instanceof LeafInputStream) {
+		if (buff instanceof LeafByteChannel) {
 			
-			ByteBuffer buffer = ((LeafInputStream) buff).read(size);
+			ByteBuffer buffer = ((LeafByteChannel) buff).read(size);
 			return buffer.array();
 			
 		} else {
@@ -70,11 +71,11 @@ public class SimpleDatabase extends BTreeDatabase {
 	
 	public int readVLQU(final SeekableInMemoryByteChannel stream) throws IOException, StarDBException {
 		
-		if (stream instanceof LeafInputStream) {
+		if (stream instanceof LeafByteChannel) {
 			
 			int value = 0;
 			
-			LeafInputStream leafStream = (LeafInputStream) stream;
+			LeafByteChannel leafStream = (LeafByteChannel) stream;
 			
 			while (true) {
 				
