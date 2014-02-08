@@ -63,15 +63,15 @@ public abstract class BTreeDatabase extends BTree {
 	}
 	
 	/**
-	 * 
-	 * @throws StarDBException
+	 * Opens the database file for reading and verifies its type.
+	 * @throws StarDBException - The file is not a valid database file or an error occurred while reading the file.
 	 */
 	protected void open() throws StarDBException {
 		
 		blockStorage.open();
-
+		
 		SeekableByteChannel userData = blockStorage.readUserData(0, 28);
-
+		
 		ByteBuffer buffer = StarDBUtils.readToBuffer(userData, 12);
 		
 		String fileID = new String(buffer.array());
@@ -101,13 +101,12 @@ public abstract class BTreeDatabase extends BTree {
 	}
 	
 	/**
-	 * 
-	 * @param pointer
-	 * @return
-	 * @throws StarDBException
-	 * @throws IOException
+	 * Reads the index block at the specified pointer and parses its contents into nodes.
+	 * @param pointer - The index of the block in the database file.
+	 * @return The node containing this block's, well, nodes.
+	 * @throws StarDBException - The block is not an index block or an error occurred while reading the block data.
 	 */
-	protected IndexNode readIndex(final int pointer) throws StarDBException, IOException {
+	protected IndexNode readIndex(final int pointer) throws StarDBException {
 		
 		IndexNode index = new IndexNode();
 
@@ -145,7 +144,7 @@ public abstract class BTreeDatabase extends BTree {
 	}
 
 	@Override
-	protected IndexNode loadIndex(int pointer) throws StarDBException, IOException {
+	protected IndexNode loadIndex(int pointer) throws StarDBException {
 		
 		if (!indexCache.containsKey(pointer)) {
 			IndexNode index = readIndex(pointer);
@@ -158,7 +157,7 @@ public abstract class BTreeDatabase extends BTree {
 	}
 
 	@Override
-	protected LeafNode loadLeaf(int pointer) throws StarDBException, IOException {
+	protected LeafNode loadLeaf(int pointer) throws StarDBException {
 		
 		LeafNode leaf = new LeafNode();
 		
@@ -174,9 +173,11 @@ public abstract class BTreeDatabase extends BTree {
 
 		leaf.selfPointer = pointer;
 		
-		LeafByteChannel leafInput = new LeafByteChannel(blockStorage, byteChannel);
+		SeekableByteChannel leafInput = new LeafByteChannel(blockStorage, byteChannel);
 		
-		int count = leafInput.read(4).getInt();
+		buffer = StarDBUtils.readToBuffer(leafInput, 4);
+		
+		int count = buffer.getInt();
 		
 		for (int i = 0; i < count; i++) {
 			byte[] key = readKey(leafInput);
@@ -189,33 +190,31 @@ public abstract class BTreeDatabase extends BTree {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Returns the size of the key value.
+	 * @return The size of the key value in bytes.
 	 */
 	protected abstract int getKeySize();
 	
 	/**
-	 * 
-	 * @return
+	 * Returns the content identifier.
+	 * @return The content identifier used to verify the database's contents.
 	 */
 	protected abstract String getContentIdentifier();
 	
 	/**
-	 * 
-	 * @param buff
-	 * @return
-	 * @throws IOException
-	 * @throws StarDBException
+	 * Reads the key at the current position in the byteChannel.
+	 * @param byteChannel - The ByteChannel from which to read the key.
+	 * @return The key as a byte array.
+	 * @throws StarDBException - An error occurred while attempting to read the key.
 	 */
-	protected abstract byte[] readKey(final SeekableByteChannel buff) throws IOException, StarDBException;
+	protected abstract byte[] readKey(final SeekableByteChannel byteChannel) throws StarDBException;
 	
 	/**
-	 * 
-	 * @param buff
-	 * @return
-	 * @throws IOException
-	 * @throws StarDBException
+	 * Reads the data stored at the current position in the byteChannel.
+	 * @param byteChannel - The ByteChannel from which to read the stored data.
+	 * @return The stored data as a byte array.
+	 * @throws StarDBException - An error occurred while attempting to read the data.
 	 */
-	protected abstract byte[] readData(final SeekableByteChannel buff) throws IOException, StarDBException;
+	protected abstract byte[] readData(final SeekableByteChannel byteChannel) throws StarDBException;
 	
 }

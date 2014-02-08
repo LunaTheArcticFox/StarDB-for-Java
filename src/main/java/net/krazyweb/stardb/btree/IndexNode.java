@@ -51,6 +51,9 @@ public class IndexNode {
 	protected int beginPointer;
 	private List<IndexElement> pointers;
 	
+	/**
+	 * Creates a new IndexNode, which contains pointers to other nodes.
+	 */
 	protected IndexNode() {
 		selfPointer = 0;
 		level = 0;
@@ -58,10 +61,10 @@ public class IndexNode {
 		pointers = new ArrayList<>();
 	}
 	
-	/*
-	 * Note: This will not return the location of the key's IndexElement if the key is
-     *  not in the index - it'll return the position where it should be inserted. This is
-	 * used internally to figure out which branch of the tree to go down.
+	/**
+	 * Finds the index in the list of pointers of the given key.
+	 * @param key - The key for which to search in the pointer list.
+	 * @return The index of the given key.
 	 */
 	protected int find(final byte[] key) {
 		int i = Collections.binarySearch(pointers, new IndexElement(key, 0));
@@ -76,6 +79,10 @@ public class IndexNode {
 		}
 	}
 	
+	/**
+	 * Returns the number of pointers within this node.
+	 * @return The number of pointers within this node.
+	 */
 	protected int size() {
 		if (beginPointer != 0) {
 			return pointers.size() + 1;
@@ -84,6 +91,11 @@ public class IndexNode {
 		}
 	}
 	
+	/**
+	 * Retrieves the pointer at the given index.
+	 * @param i - The index of the pointer to retrieve.
+	 * @return The pointer at the given index.
+	 */
 	protected int pointer(final int i) {
 		if (i == 0) {
 			return beginPointer;
@@ -92,7 +104,11 @@ public class IndexNode {
 		}
 	}
 	
-	//Since self.pointers must be sorted, this should be used with care
+	/**
+	 * Adds a pointer to this node's pointers. This should be used with care, as the list *must* remain sorted.
+	 * @param key - The key of the pointer so that it can be retrieved.
+	 * @param pointer - The pointer itself.
+	 */
 	protected void addPointer(final byte[] key, final int pointer) {
 		pointers.add(new IndexElement(key, pointer));
 	}

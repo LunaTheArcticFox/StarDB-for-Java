@@ -10,7 +10,21 @@ added in the future.
 
 ## Usage
 
-Coming soon!
+First, open the database file:
+```java
+AssetDatabase db = AssetDatabase.open("D:/Games/Steam/steamapps/common/Starbound/assets/packed.pak");
+```
+
+You can then grab individual assets from the database as byte arrays:
+```java
+System.out.println(new String(db.getAsset("/player.config")));
+```
+
+You can also get a List of each file in the database as well as all broken files (see Current Issues):
+```java
+System.out.println(db.getBrokenFileList());
+System.out.println(db.getFileList());
+```
 
 ## Current Issues
 
@@ -18,6 +32,3 @@ There is a bug (or maybe a deliberate change) in the Starbound SHA256
 implementation, which results in the hash for every 55 character string to be 
 incorrect. This means reading any file from an AssetsDatabase that has a 55 
 character file path will not work.
-
-Also, this is not ready for use yet. It needs cleaning up before I'll consider
-it a proper library. All the functionality is there, however.

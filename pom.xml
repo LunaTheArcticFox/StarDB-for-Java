@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.krazyweb</groupId>
   <artifactId>stardb</artifactId>
-  <version>0.1</version>
+  <version>1.0</version>
   <name>StarDB for Java</name>
   <description>A port of StarDB to Java to read Starbound's database files.</description>
   <build>

@@ -20,20 +20,14 @@ public class LeafByteChannel extends SeekableInMemoryByteChannel {
 	protected LeafByteChannel(final BlockStorage blockStorage, final SeekableByteChannel blockBuffer) {
 		this.blockStorage = blockStorage;
 		this.blockBuffer = blockBuffer;
+		open = true;
 	}
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.nio.channels.SeekableByteChannel#read(java.nio.ByteBuffer)
-     */
+	
     @Override
     public int read(final ByteBuffer destination) throws IOException {
-    	return 0;
-    }
-	
-	public ByteBuffer read(final int size) throws IOException, StarDBException {
-		
+    	
+    	final int size = destination.capacity();
+    	
 		ByteBuffer data = ByteBuffer.allocate(size);
 		
 		long blockDataSize = blockStorage.getBlockSize() - 4;
@@ -63,25 +57,32 @@ public class LeafByteChannel extends SeekableInMemoryByteChannel {
                 tempBuffer.rewind();
                 int nextBlockPointer = tempBuffer.getInt();
                 if (nextBlockPointer != -1) {
-                    blockBuffer = blockStorage.readBlock(nextBlockPointer);
+                    try {
+						blockBuffer = blockStorage.readBlock(nextBlockPointer);
+					} catch (StarDBException e) {
+						throw new IOException("Error: " + e.getMessage(), e);
+					}
                     tempBuffer = ByteBuffer.allocate(2);
                     tempBuffer.order(ByteOrder.BIG_ENDIAN);
                     blockBuffer.read(tempBuffer);
                     tempBuffer.rewind();
                     String magic = new String(tempBuffer.array());
                     if (!magic.equals(leafMagic)) {
-	                    throw new StarDBException("Incorrect leaf block signature"); //RUNTIMEEXCEPTION
+	                    throw new IOException("Incorrect leaf block signature"); //RUNTIMEEXCEPTION
                     }
                 } else { 
-                    throw new StarDBException("Insufficient leaf data"); //RUNTIMEEXCEPTION
+                    throw new IOException("Insufficient leaf data"); //RUNTIMEEXCEPTION
                 }
 			}
 
 		}
 
 		data.rewind();
-		return data;
+		destination.put(data);
+		destination.rewind();
 		
-	}
+    	return 0;
+    	
+    }
 
 }

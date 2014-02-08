@@ -38,7 +38,7 @@ public class SeekableInMemoryByteChannel implements SeekableByteChannel {
      * Whether or not this {@link SeekableByteChannel} is open; volatile instead of sync is acceptable because this
      * field participates in no compound computations or invariants with other instance members.
      */
-    private volatile boolean open;
+    protected volatile boolean open;
 
     /**
      * Internal buffer for contents; guarded by "this"

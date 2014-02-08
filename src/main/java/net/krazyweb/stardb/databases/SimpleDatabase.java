@@ -1,13 +1,10 @@
 package net.krazyweb.stardb.databases;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
 
 import net.krazyweb.stardb.StarDBUtils;
 import net.krazyweb.stardb.btree.BTreeDatabase;
-import net.krazyweb.stardb.btree.LeafByteChannel;
 import net.krazyweb.stardb.exceptions.StarDBException;
 import net.krazyweb.stardb.storage.BlockFile;
 
@@ -17,10 +14,10 @@ public class SimpleDatabase extends BTreeDatabase {
 	private int keySize;
 	
 	/**
-	 * 
-	 * @param blockFile
-	 * @param contentID
-	 * @param keySize
+	 * Creates a new SimpleDatabase, which implements some basic database access methods.
+	 * @param blockFile - The file containing the database.
+	 * @param contentID - The identifier for the content of the database.
+	 * @param keySize - The size of each key in the database.
 	 */
 	protected SimpleDatabase(final BlockFile blockFile, final String contentID, final int keySize) {
 		super(blockFile);
@@ -39,39 +36,18 @@ public class SimpleDatabase extends BTreeDatabase {
 	}
 
 	@Override
-	protected byte[] readKey(final SeekableByteChannel buff) throws IOException, StarDBException {
-		if (buff instanceof LeafByteChannel) {
-			ByteBuffer buffer = ((LeafByteChannel) buff).read(keySize);
-			return buffer.array();
-		} else {
-			ByteBuffer buffer = ByteBuffer.allocate(keySize);
-			buffer.order(ByteOrder.BIG_ENDIAN);
-			buff.read(buffer);
-			buffer.rewind();
-			return buffer.array();
-		}
+	protected byte[] readKey(final SeekableByteChannel byteChannel) throws StarDBException {
+		ByteBuffer buffer = StarDBUtils.readToBuffer(byteChannel, keySize);
+		return buffer.array();
 	}
 
 	@Override
-	protected byte[] readData(final SeekableByteChannel buff) throws IOException, StarDBException {
+	protected byte[] readData(final SeekableByteChannel byteChannel) throws StarDBException {
 		
-		int size = StarDBUtils.readVLQU(buff);
-		
-		if (buff instanceof LeafByteChannel) {
-			
-			ByteBuffer buffer = ((LeafByteChannel) buff).read(size);
-			return buffer.array();
-			
-		} else {
-			
-			ByteBuffer buffer = ByteBuffer.allocate(size);
-			buffer.order(ByteOrder.BIG_ENDIAN);
-			buff.read(buffer);
-			buffer.rewind();
-			return buffer.array();
-			
-		}
-    	
+		int size = StarDBUtils.readVLQU(byteChannel);
+
+		ByteBuffer buffer = StarDBUtils.readToBuffer(byteChannel, size);
+		return buffer.array();
 		
 	}
 	
