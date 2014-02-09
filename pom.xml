@@ -4,30 +4,19 @@
 	<groupId>net.krazyweb</groupId>
 	<artifactId>stardb4j</artifactId>
 	<version>1.0</version>
+	<packaging>jar</packaging>
+	
 	<name>StarDB for Java</name>
 	<description>A port of StarDB to Java to read Starbound's database files.</description>
+	<url>https://github.com/KrazyTheFox/StarDB-for-Java</url>
 	
 	<licenses>
 		<license>
-			<comments>This is the license the library itself is under.</comments>
 			<name>MIT</name>
 			<url>http://opensource.org/licenses/MIT</url>
-		</license>
-		<license>
-			<comments>The SeekableInMemoryByteChannel file used internally is under this license. The file in question is found here: http://grepcode.com/file/repo1.maven.org/maven2/org.jboss.shrinkwrap/shrinkwrap-api-nio2/1.2.0/org/jboss/shrinkwrap/api/nio/file/SeekableInMemoryByteChannel.java#SeekableInMemoryByteChannel</comments>
-			<name>Apache 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      		<distribution>repo</distribution>
 		</license>
 	</licenses>
-
-	<url>https://github.com/KrazyTheFox/StarDB-for-Java</url>
-
-	<developers>
-		<developer>
-			<id>KrazyTheFox</id>
-			<name>Mitchell Matthews</name>
-		</developer>
-	</developers>
 
 	<build>
 		<plugins>
@@ -41,4 +30,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	
 </project>

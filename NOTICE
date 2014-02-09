@@ -1,4 +1,4 @@
-Original Python library:
+Original Python library: []
 
 The MIT License (MIT)
 Copyright (c) 2014 Will Donohoe
@@ -11,7 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ====================
 
-SeekableInMemoryByteChannel.java:
+SeekableInMemoryByteChannel.java: [http://grepcode.com/file/repo1.maven.org/maven2/org.jboss.shrinkwrap/shrinkwrap-api-nio2/1.2.0/org/jboss/shrinkwrap/api/nio/file/SeekableInMemoryByteChannel.java#SeekableInMemoryByteChannel]
 
 JBoss, Home of Professional Open Source
 Copyright 2012, Red Hat Middleware LLC, and individual contributors
