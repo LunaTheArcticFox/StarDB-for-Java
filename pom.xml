@@ -5,18 +5,36 @@
 	<artifactId>stardb4j</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
-	
+
 	<name>StarDB for Java</name>
 	<description>A port of StarDB to Java to read Starbound's database files.</description>
 	<url>https://github.com/KrazyTheFox/StarDB-for-Java</url>
-	
+
 	<licenses>
 		<license>
 			<name>MIT</name>
 			<url>http://opensource.org/licenses/MIT</url>
-      		<distribution>repo</distribution>
+			<distribution>repo</distribution>
+		</license>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
+	<scm>
+		<connection>scm:git:git://github.com/KrazyTheFox/StarDB-for-Java</connection>
+		<developerConnection>scm:git:git@github.com/KrazyTheFox/StarDB-for-Java</developerConnection>
+		<url>https://github.com/KrazyTheFox/StarDB-for-Java</url>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>KrazyTheFox</id>
+			<name>Mitchell Matthews</name>
+		</developer>
+	</developers>
 
 	<build>
 		<plugins>
@@ -28,7 +46,21 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-	
+
 </project>
