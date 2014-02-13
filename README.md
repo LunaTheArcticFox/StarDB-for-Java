@@ -8,6 +8,15 @@ game is based on as well.
 Currently StarDB only supports read operations, but write operations may be 
 added in the future.
 
+Now available through the Maven Central Repository! Just add the following to your pom.xml:
+```xml
+<dependency>
+    <groupId>net.krazyweb</groupId>
+    <artifactId>stardb4j</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
 ## Usage
 
 First, open the database file:

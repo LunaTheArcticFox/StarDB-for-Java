@@ -5,5 +5,4 @@
 .project
 .settings
 pom.xml.releaseBackup
-settings.xml
 release.properties
