@@ -5,10 +5,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
 
+import net.krazyweb.stardb.SeekableInMemoryByteChannel;
 import net.krazyweb.stardb.exceptions.StarDBException;
 import net.krazyweb.stardb.storage.BlockStorage;
-
-import org.jboss.shrinkwrap.api.nio.file.SeekableInMemoryByteChannel;
 
 public class LeafByteChannel extends SeekableInMemoryByteChannel {
 	

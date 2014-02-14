@@ -9,8 +9,6 @@ import java.util.List;
 
 import net.krazyweb.stardb.exceptions.StarDBException;
 
-import org.jboss.shrinkwrap.api.nio.file.SeekableInMemoryByteChannel;
-
 public class StarDBUtils {
 	
 	/**

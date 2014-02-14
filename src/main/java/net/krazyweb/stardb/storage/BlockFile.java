@@ -8,10 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+import net.krazyweb.stardb.SeekableInMemoryByteChannel;
 import net.krazyweb.stardb.StarDBUtils;
 import net.krazyweb.stardb.exceptions.StarDBException;
-
-import org.jboss.shrinkwrap.api.nio.file.SeekableInMemoryByteChannel;
 
 public class BlockFile extends BlockStorage {
 
