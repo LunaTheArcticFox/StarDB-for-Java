@@ -86,13 +86,8 @@ public class AssetDatabase extends SimpleSha256Database {
 	 * @throws StarDBException An error occurred while reading the database.
 	 */
 	public List<String> getBrokenFileList() throws StarDBException {
-		List<String> output = new ArrayList<>();
-		for (String file : getFileList()) {
-			if (file.length() == 55) {
-				output.add(file);
-			}
-		}
-		return output;
+		//No known bugs
+		return new ArrayList<String>();
 	}
 	
 }
