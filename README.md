@@ -13,7 +13,7 @@ Now available through the Maven Central Repository! Just add the following to yo
 <dependency>
     <groupId>net.krazyweb</groupId>
     <artifactId>stardb4j</artifactId>
-    <version>1.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -34,15 +34,11 @@ You can then grab individual assets from the database as byte arrays:
 System.out.println(new String(db.getAsset("/player.config")));
 ```
 
-You can also get a List of each file in the database as well as all broken files (see Current Issues):
+You can also get a List of each file in the database as well as all broken files:
 ```java
-System.out.println(db.getBrokenFileList());
+System.out.println(db.getBrokenFileList()); //This currently returns an empty set, as there are no known bugs preventing reading data.
 System.out.println(db.getFileList());
 ```
 
 ## Current Issues
-
-There is a bug (or maybe a deliberate change) in the Starbound SHA256 
-implementation, which results in the hash for every 55 character string to be 
-incorrect. This means reading any file from an AssetsDatabase that has a 55 
-character file path will not work.
+No known bugs!
