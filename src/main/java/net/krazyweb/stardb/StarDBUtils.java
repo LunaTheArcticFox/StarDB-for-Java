@@ -12,9 +12,9 @@ import net.krazyweb.stardb.exceptions.StarDBException;
 public class StarDBUtils {
 	
 	/**
-	 * Reads some kind of size data from the file. The original implementation of this method in Python did not explain the acronym.
+	 * Reads a variable length quantity from the current position in the bytechannel.
 	 * @param byteChannel - The SeekableByteChannel to read from.
-	 * @return A value of some kind, seemingly used to specify object data lengths.
+	 * @return A length (in bytes) for something.
 	 * @throws StarDBException
 	 */
 	public static int readVLQU(final SeekableByteChannel byteChannel) throws StarDBException {

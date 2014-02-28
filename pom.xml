@@ -35,7 +35,7 @@
 		<connection>scm:git:git@github.com:KrazyTheFox/StarDB-for-Java.git</connection>
 		<developerConnection>scm:git:git@github.com:KrazyTheFox/StarDB-for-Java.git</developerConnection>
 		<url>https://github.com/KrazyTheFox/StarDB-for-Java</url>
-		<tag>stardb4j-1.0</tag>
+		<tag>stardb4j-1.2.0</tag>
 	</scm>
 
 	<distributionManagement>

@@ -63,12 +63,37 @@ public abstract class BTreeDatabase extends BTree {
 	}
 	
 	/**
+	 * Gets the content ID of the file to determine which database format to read.
+	 * @return The content ID of the database.
+	 * @throws StarDBException - The file is not a valid database file or an error occurred while reading the file.
+	 */
+	protected String getContentID() throws StarDBException {
+		
+		blockStorage.open();
+		
+		SeekableByteChannel userData = blockStorage.readUserData(0, 28);
+		
+		ByteBuffer buffer = StarDBUtils.readToBuffer(userData, 12);
+		
+		String fileID = new String(buffer.array());
+		
+		if (!fileID.startsWith(fileIdentifier)) {
+			throw new StarDBException("DB file identifier does not match expected value of " + fileIdentifier + " (Got " + fileID + ")");
+		}
+		
+		buffer = StarDBUtils.readToBuffer(userData, 12);
+		
+		String contentID = new String(buffer.array());
+		
+		return contentID;
+		
+	}
+	
+	/**
 	 * Opens the database file for reading and verifies its type.
 	 * @throws StarDBException - The file is not a valid database file or an error occurred while reading the file.
 	 */
 	protected void open() throws StarDBException {
-		
-		blockStorage.open();
 		
 		SeekableByteChannel userData = blockStorage.readUserData(0, 28);
 		

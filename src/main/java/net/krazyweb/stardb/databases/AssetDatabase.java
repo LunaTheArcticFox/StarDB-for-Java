@@ -12,10 +12,10 @@ import net.krazyweb.stardb.storage.BlockFile;
 
 public class AssetDatabase extends SimpleSha256Database {
 	
-	private List<String> fileList;
+	protected List<String> fileList;
 	
-	private AssetDatabase(final BlockFile blockFile) {
-		super(blockFile, "Assets1");
+	protected AssetDatabase(final BlockFile blockFile, final String ID) {
+		super(blockFile, ID);
 		fileList = null;
 	}
 	
@@ -27,10 +27,27 @@ public class AssetDatabase extends SimpleSha256Database {
 	 * @throws StarDBException An error occurred while trying to read the database file.
 	 */
 	public static AssetDatabase open(final Path databaseFile) throws IOException, StarDBException {
+		
 		BlockFile bf = new BlockFile(databaseFile);
-		AssetDatabase db = new AssetDatabase(bf);
+		
+		AssetDatabase tempDB = new AssetDatabase(bf, "Assets1");
+		AssetDatabase db = null;
+		
+		String id = tempDB.getContentID();
+		
+		if (id.startsWith("Assets1")) {
+			db = new AssetDatabase1(bf);
+		} else if (id.startsWith("Assets2")) {
+			db = new AssetDatabase2(bf);
+		}
+		
+		if (db == null) {
+			throw new StarDBException("Could not read the database content type.");
+		}
+		
 		db.open();
 		return db;
+		
 	}
 	
 	/**
