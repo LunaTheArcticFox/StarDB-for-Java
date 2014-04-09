@@ -13,7 +13,7 @@ Now available through the Maven Central Repository! Just add the following to yo
 <dependency>
     <groupId>net.krazyweb</groupId>
     <artifactId>stardb4j</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 
