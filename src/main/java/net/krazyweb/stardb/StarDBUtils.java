@@ -64,10 +64,11 @@ public class StarDBUtils {
 	/**
 	 * Unpacks a Starbound database list into a list of Strings.
 	 * @param data - The data to parse as a byte array.
+	 * @param multiplier - The entries per file in the database list.
 	 * @return A list of Strings converted from Starbound's stored list format.
 	 * @throws StarDBException An error occurred while unpacking the data.
 	 */
-	public static List<String> unpackStringList(final byte[] data) throws StarDBException {
+	public static List<String> unpackStringList(final byte[] data, final int multiplier) throws StarDBException {
 		
 		List<String> output = new ArrayList<>();
 		
@@ -90,7 +91,7 @@ public class StarDBUtils {
 		
 		int count = StarDBUtils.readVLQU(stream);
 		
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < count * multiplier; i++) {
 			int strLen = StarDBUtils.readVLQU(stream);
 			ByteBuffer buff = readToBuffer(stream, strLen);
 			output.add(new String(buff.array()));

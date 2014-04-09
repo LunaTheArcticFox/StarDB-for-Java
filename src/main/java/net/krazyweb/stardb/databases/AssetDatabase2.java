@@ -21,12 +21,13 @@ public class AssetDatabase2 extends AssetDatabase {
 			return fileList;
 		}
 		
-		fileList = StarDBUtils.unpackStringList(getItem("_index".getBytes()));
+		fileList = StarDBUtils.unpackStringList(getItem("_index".getBytes()), 2);
 		
 		Set<String> toRemove = new HashSet<>();
 		
 		for (int i = 0; i < fileList.size(); i++) {
 			if (i % 2 == 1) {
+				//System.out.println(fileList.get(i));
 				toRemove.add(fileList.get(i));
 			}
 		}

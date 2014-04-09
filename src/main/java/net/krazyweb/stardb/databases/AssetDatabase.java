@@ -91,7 +91,7 @@ public class AssetDatabase extends SimpleSha256Database {
 			return fileList;
 		}
 		
-		fileList = StarDBUtils.unpackStringList(getItem("_index".getBytes()));
+		fileList = StarDBUtils.unpackStringList(getItem("_index".getBytes()), 1);
 		
 		return fileList;
 		
